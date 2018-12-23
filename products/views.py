@@ -1,5 +1,5 @@
 from django.http  import HttpResponse,Http404
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 import datetime as dt
 
 
@@ -10,17 +10,7 @@ def welcome(request):
 
 def stalk_of_day(request):
     date = dt.date.today()
-
-    # FUNCTION TO CONVERT DATE OBJECT TO FIND EXACT DAY
-    day = convert_dates(date)
-    html = f'''
-        <html>
-            <body>
-                <h1>News for {day} {date.day}-{date.month}-{date.year}</h1>
-            </body>
-        </html>
-            '''
-    return HttpResponse(html)
+    return render(request, 'all-products/today-products.html', {"date": date,})
 
 def convert_dates(dates):
 
@@ -33,13 +23,19 @@ def convert_dates(dates):
     day = days[day_number]
     return day
 
-def past_days_stalk(request,past_date):
+def past_days_stalk(request, past_date):
 
     try:
         # Converts data from the string Url
-        date = dt.datetime.strptime(past_date,'%Y-%m-%d').date()
+        date = dt.datetime.strptime(past_date, '%Y-%m-%d').date()
 
     except ValueError:
         # Raise 404 error when ValueError is thrown
         raise Http404()
+        assert False
+
+    if date == dt.date.today():
+        return redirect(stalk_of_day)
+
+    return render(request, 'all-products/past-products.html', {"date": date})
 
